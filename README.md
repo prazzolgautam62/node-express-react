@@ -59,6 +59,12 @@ Frontend (React): Runs on http://localhost:3001.
 In the project root, you can run the following npm scripts:
 
 ```bash
+npm run database:migrate
+```
+
+Runs database migrations and creates all necessary tables.
+
+```bash
 npm run dev:all
 ```
 
