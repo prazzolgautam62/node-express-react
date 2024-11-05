@@ -1,10 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
 import { _login } from '../services/auth';
 import '../css/Login.css';
+import { UserContext } from '../context';
 
 const Login = () => {
+  const [auth, dispatch] = useContext(UserContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -15,7 +17,9 @@ const Login = () => {
     try {
       const res = await _login({ email: email, password: password });
       if (res.status) {
-        localStorage.setItem('user', JSON.stringify(res.data));
+        dispatch({ type: 'SET_USER', payload: res.data.user });
+        dispatch({ type: 'SET_TOKEN', payload: res.data.token });
+
         navigate('/admin/dashboard');
       }
       else {
@@ -31,9 +35,7 @@ const Login = () => {
   };
 
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem('user'));
-    let isAuthenticated = (user ? !!user.token : false);
-    if(isAuthenticated){
+    if(auth.token){
       navigate('/admin/dashboard');
     }
   },[])

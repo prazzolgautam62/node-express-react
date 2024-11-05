@@ -1,16 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import useAuth from '../hooks/use-auth';
 
 const Dashboard = () => {
   const [user,setUser] = useState({});
 
-  useEffect(() => {
-    let userData = JSON.parse(localStorage.getItem('user'));
-    setUser(userData.user);
-  }, []);
+  const {auth} = useAuth();
 
   return (
     <div>
-      <h1>Welcome, {user?.name}</h1>
+      <h1>Welcome, {auth?.user?.name}</h1>
     </div>
   );
 };

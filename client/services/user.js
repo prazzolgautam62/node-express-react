@@ -1,11 +1,10 @@
 import axios from "axios";
+import { getFromStorage } from "../utils";
 
 axios.defaults.baseURL = `http://localhost:3000/`;
 
 function getAccessToken() {
-    let user =  localStorage.getItem('user');
-    let token = user ? (JSON.parse(user)).token : '';
-    return token;
+    return getFromStorage('TOKEN');
 }
 
 function _getAllUsers() {

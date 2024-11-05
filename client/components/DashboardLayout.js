@@ -1,14 +1,14 @@
 import React, {useEffect} from "react";
 import NavBar from "./NavBar";
 import { useNavigate } from 'react-router-dom';
+import useAuth from "../hooks/use-auth";
 
 function DashboardLayout({ children }) {
   const navigate = useNavigate();
+  const {auth} = useAuth();
 
   useEffect(() => {
-    let user = JSON.parse(localStorage.getItem('user'));
-    let isAuthenticated = (user ? !!user.token : false);
-    if(!isAuthenticated){
+    if(!auth.token){
       navigate('/login');
     }
   },[])

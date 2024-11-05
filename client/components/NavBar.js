@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import {Link, useNavigate } from 'react-router-dom';
 import Button from 'react-bootstrap/Button';
 import Container from 'react-bootstrap/Container';
@@ -6,19 +6,21 @@ import Form from 'react-bootstrap/Form';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import NavDropdown from 'react-bootstrap/NavDropdown';
+import { UserContext } from '../context';
 
 function NavBar() {
-  const navigate = useNavigate();
+  const [auth, dispatch] = useContext(UserContext);
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    navigate('/login');
+    localStorage.clear();
+    dispatch({ type: "RESET_USER" });
+    dispatch({ type: "RESET_TOKEN" });
   };
 
   return (
     <Navbar expand="lg" className="bg-body-tertiary">
       <Container fluid>
-        <Navbar.Brand as={Link} to="/admin/dashboard">Navbar Brand</Navbar.Brand>
+        <Navbar.Brand as={Link} to="/">Navbar Brand</Navbar.Brand>
         <Navbar.Toggle aria-controls="navbarScroll" />
         <Navbar.Collapse id="navbarScroll">
           <Nav
