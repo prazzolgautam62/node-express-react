@@ -6,6 +6,9 @@ import Landing from '../components/Landing';
 import { UserContext } from '../context';
 import { initialAuth,userReducer } from '../reducer/user';
 import AdminRoute from '../routes/AdminRoute';
+import Register from '../components/Register';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 function App() {
   const [auth, dispatchUser] = useReducer(userReducer, initialAuth);
@@ -16,6 +19,7 @@ function App() {
         <Routes>
           <Route exact path="/" element={<Landing />} />
           <Route exact path="/login" element={<Login />} />
+          <Route exact path="/register" element={<Register />} />
 
           <Route
               path="/admin/*"
@@ -29,6 +33,7 @@ function App() {
             />
             <Route path="*" element={<NotFound />} />
         </Routes>
+        <ToastContainer />
       </div>
       </UserContext.Provider>
     </Router>

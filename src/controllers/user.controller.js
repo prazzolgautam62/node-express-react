@@ -1,34 +1,66 @@
 const User = require("../models/user.model.js");
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { body, validationResult } = require('express-validator');
+
+const userValidationRules = () => {
+  return [
+    body('name')
+      .notEmpty().withMessage('Name is required.')
+      .isLength({ min: 3 }).withMessage('Name must be at least 3 characters long.'),
+    body('email')
+      .isEmail().withMessage('Email is not valid.')
+      .notEmpty().withMessage('Email is required.'),
+    body('password')
+      .notEmpty().withMessage('Password is required.')
+      .isLength({ min: 6 }).withMessage('Password must be at least 6 characters long.'),
+    body('passwordConfirmation')
+      .notEmpty().withMessage('Password confirmation is required.')
+      .custom((value, { req }) => {
+        if (value !== req.body.password) {
+          throw new Error('Password confirmation does not match password.');
+        }
+        return true;
+      }),
+  ];
+};
 
 // Create and Save a new User
-exports.create = (req, res) => {
-  // Validate request
-  if (!req.body) {
-    res.status(400).send({
-      message: "Content can not be empty!"
-    });
-    return;
-  }
-
-  // Create a User
-  const user = new User({
-    name: req.body.name,
-    email: req.body.email,
-    password: req.body.password,
-    active: req.body.active
-  });
-
-  // Save User in the database
-  User.create(user, (err, data) => {
-    if (err)
-      res.status(500).send({
-        message: err.message || "Some error occurred while creating the User."
+exports.create = [
+  userValidationRules(),
+  (req, res) => {
+    // Validate request
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(200).send({
+        status: false,
+        message: 'Validation failed',
+        errors: errors.array()
       });
-    else res.send(data);
-  });
-};
+    }
+
+    // Create a User
+    const user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      password: req.body.password,
+      active: req.body.active
+    });
+
+    // Save User in the database
+    User.create(user, (err, data) => {
+      if (err)
+        res.status(500).send({
+          message: err.message || "Some error occurred while creating the User."
+        });
+      else {
+        const token = jwt.sign({ id: data.id }, process.env.JWT_SECRET_KEY, { expiresIn: 86400 });
+        const response = { token: token, user: data };
+        res.status(200).send({ status: true, message: 'User registered successfully!', data: response });
+      }
+    });
+  }
+];
 
 exports.login = (req, res) => {
   const { email, password } = req.body;
@@ -41,7 +73,7 @@ exports.login = (req, res) => {
   // Find user by email
   User.findByEmail(email, async (err, user) => {
     if (err) {
-      return res.status(200).send({status: false, message: "Error retrieving user." });
+      return res.status(200).send({status: false, message: "User not found." });
     }
 
     if (!user) {

@@ -3,7 +3,6 @@ import useAuth from '../hooks/use-auth';
 
 const Dashboard = () => {
   const [user,setUser] = useState({});
-
   const {auth} = useAuth();
 
   return (

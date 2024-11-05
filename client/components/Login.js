@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
-import { Form, Button, Container, Row, Col, Card, Alert } from 'react-bootstrap';
+import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import { Form, Button, Container, Row, Col, Card, InputGroup } from 'react-bootstrap';
 import { _login } from '../services/auth';
 import '../css/Login.css';
 import { UserContext } from '../context';
+import { FaEye, FaEyeSlash } from 'react-icons/fa';
 
 const Login = () => {
   const [auth, dispatch] = useContext(UserContext);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  const togglePasswordVisibility = () => {
+    setShowPassword(!showPassword);
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -19,10 +26,11 @@ const Login = () => {
       if (res.status) {
         dispatch({ type: 'SET_USER', payload: res.data.user });
         dispatch({ type: 'SET_TOKEN', payload: res.data.token });
-
+        toast.success(res.message);
         navigate('/admin/dashboard');
       }
       else {
+        toast.error(res.message);
         setErrorMessage(res.message);
       }
     } catch (error) {
@@ -35,10 +43,10 @@ const Login = () => {
   };
 
   useEffect(() => {
-    if(auth.token){
+    if (auth.token) {
       navigate('/admin/dashboard');
     }
-  },[])
+  }, [])
 
   return (
     <Container className="d-flex justify-content-center align-items-center vh-100">
@@ -61,13 +69,18 @@ const Login = () => {
 
                 <Form.Group controlId="formBasicPassword" className="mb-3">
                   <Form.Label>Password</Form.Label>
-                  <Form.Control
-                    type="password"
-                    placeholder="Enter password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    required
-                  />
+                  <InputGroup className="mb-3">
+                    <Form.Control
+                      type={showPassword ? 'text' : 'password'}
+                      placeholder="Enter password"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                    />
+                    <InputGroup.Text onClick={togglePasswordVisibility} style={{ cursor: 'pointer' }}>
+                      {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    </InputGroup.Text>
+                  </InputGroup>
                 </Form.Group>
 
                 <Button
@@ -77,9 +90,9 @@ const Login = () => {
                 >
                   Login
                 </Button>
-                {errorMessage && <Alert className='mt-2 p-2' key={'warning'} variant={'warning'}>
-                  { errorMessage }
-                </Alert>}
+                <div className='text-center mt-2'>
+                  <NavLink to="/register">Register</NavLink>
+                </div>
               </Form>
             </Card.Body>
           </Card>

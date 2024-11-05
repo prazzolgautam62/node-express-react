@@ -7,6 +7,12 @@ function _login(data) {
     return axios.post(url, data).then(response => response.data)
 }
 
+function _register(data) {
+    const url = `users`
+    return axios.post(url, data).then(response => response.data)
+}
+
 export {
-    _login
+    _login,
+    _register
 }
