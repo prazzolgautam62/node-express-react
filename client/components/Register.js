@@ -117,6 +117,7 @@ const Register = () => {
                                 </Form.Group>
 
                                 <Button
+                                    disabled={password != passwordConfirmation}
                                     variant="primary"
                                     type="submit"
                                     className="w-100 custom-btn"
