@@ -1,12 +1,11 @@
 import React, { useReducer } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import UserList from '../components/UserList';
 import Login from '../components/Login';
-import Dashboard from '../components/Dashboard';
+import NotFound from '../components/NotFound';
 import Landing from '../components/Landing';
-import DashboardLayout from '../components/DashboardLayout';
 import { UserContext } from '../context';
 import { initialAuth,userReducer } from '../reducer/user';
+import AdminRoute from '../routes/AdminRoute';
 
 function App() {
   const [auth, dispatchUser] = useReducer(userReducer, initialAuth);
@@ -22,17 +21,13 @@ function App() {
               path="/admin/*"
               element={
                 auth.token ? (
-                  <DashboardLayout>
-                    <Routes>
-                      <Route exact path="dashboard" element={<Dashboard />} />
-                      <Route exact path="users" element={<UserList />} />
-                    </Routes>
-                  </DashboardLayout>
+                  <AdminRoute/>
                 ) : (
                   <Navigate to="/login" replace />
                 )
               }
             />
+            <Route path="*" element={<NotFound />} />
         </Routes>
       </div>
       </UserContext.Provider>
